@@ -35,6 +35,8 @@ custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+  autoswagger:
+    typefiles: []
 
 # you can overwrite defaults here
 #  stage: dev
