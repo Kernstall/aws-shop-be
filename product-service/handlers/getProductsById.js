@@ -1,14 +1,13 @@
 'use strict';
 import { createResponse } from "../utils";
-import {getMockData} from "../mock";
+import {getJoinedProductById} from "../dao";
 
 export const getProductsById = async (event, context) => {
     try{
         const productId = event.pathParameters.productId;
-        const products = await getMockData();
-        const requestedElem = products.find(elem => elem.id === productId);
-        if(requestedElem) {
-            return createResponse(200, requestedElem);
+        const product = await getJoinedProductById(productId);
+        if(product) {
+            return createResponse(200, product);
         } else {
             return createResponse(404, {message: "Product not found"});
         }
