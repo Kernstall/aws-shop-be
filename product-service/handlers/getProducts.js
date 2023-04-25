@@ -1,11 +1,11 @@
 'use strict';
 import { createResponse } from "../utils";
-import {getMockData} from "../mock";
+import {getJoinedProductsList} from "../dao";
 
 export const getProducts = async (event, context) => {
     try{
 
-        const products = await getMockData();
+        const products = await getJoinedProductsList();
 
         return createResponse(200, products);
     } catch (error){
