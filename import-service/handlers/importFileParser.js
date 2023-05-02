@@ -1,25 +1,36 @@
 'use strict';
 import { createResponse } from "../utils";
-import { S3 } from 'aws-sdk';
+import { S3, SQS } from 'aws-sdk';
 const csv = require("csv-parser");
 const CSV_BUCKET_NAME = 'aws-shop-csv-storage';
 
 const params = { region: 'us-east-1' };
+const sqs = new SQS({ region: 'us-east-1' });
 const s3 = new S3(params);
 
 const getObject = async (key) => {
     const arr = [];
     const object = await s3.getObject({Key: key, Bucket: CSV_BUCKET_NAME});
     const readStream = object.createReadStream();
-    console.log(`---Csv parsing started `, key);
+    //console.log(`---Csv parsing started `, key);
     return await new Promise((resolve, reject) => {
         readStream.pipe(csv())
             .on("data", function (data) {
-                console.log('---Parsed csv entry: ', data);
+                //console.log('---Parsed csv entry: ', data);
+                sqs.sendMessage({
+                        QueueUrl: process.env.SQS_URL,
+                        MessageBody: JSON.stringify(data),
+                    },
+                    (error, data) => {
+                        if (error) {
+                            console.log('---Error sending message to sqs: ', error)
+                        }
+                    }
+                )
                 arr.push(data);
             })
             .on("end", function () {
-                console.log(`---Csv parsing ended`);
+                //console.log(`---Csv parsing ended`);
                 resolve(arr);
             })
             .on("error", function (error) {

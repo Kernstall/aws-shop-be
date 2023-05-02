@@ -13,6 +13,9 @@ provider:
   stage: dev1
   region: us-east-1
   profile: sandx
+  environment:
+    SQS_URL:
+      Ref: catalogItemsQueue
   iam:
     role:
       statements:
@@ -24,6 +27,10 @@ provider:
             - 's3:GetObject'
             - 's3:PutObject'
           Resource: 'arn:aws:s3:::aws-shop-csv-storage/*'
+        - Effect: Allow
+          Action: 'sqs:*'
+          Resource:
+            - Fn::GetAtt: [ catalogItemsQueue, Arn ]
 
 
 plugins:
@@ -37,6 +44,12 @@ custom:
   autoswagger:
     typefiles: []
 
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: aws-shop-catalog-items-queue
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
