@@ -1,0 +1,29 @@
+service: authorization-service
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: dev1
+  region: us-east-1
+  profile: sandx
+  environment:
+    TEST_USERNAME: ${env:TEST_USERNAME}
+  httpApi:
+    cors: true
+
+plugins:
+  - serverless-auto-swagger
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  autoswagger:
+    typefiles: []
+
+functions:
+  basicAuthorizer:
+    handler: handlers/basicAuthorizer.basicAuthorizer
